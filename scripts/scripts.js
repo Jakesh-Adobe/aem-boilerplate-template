@@ -75,6 +75,34 @@ function buildWidgetAutoBlocks(main) {
 }
 
 /**
+ * Turns standalone YouTube, Vimeo, and Twitter/X links into embed blocks.
+ * @param {Element} main The container element
+ */
+function buildEmbedAutoBlocks(main) {
+  const embedLinks = [...main.querySelectorAll('a[href]')].filter((link) => {
+    const href = link.href;
+    return href.includes('youtube.com')
+      || href.includes('youtu.be')
+      || href.includes('vimeo.com')
+      || href.includes('twitter.com')
+      || href.includes('x.com');
+  });
+
+  embedLinks.forEach((link) => {
+    if (link.closest('.embed')) return;
+
+    const p = link.closest('p');
+    if (
+      p
+      && p.querySelectorAll('a').length === 1
+      && p.textContent.trim() === link.textContent.trim()
+    ) {
+      p.replaceWith(buildBlock('embed', { elems: [link.cloneNode(true)] }));
+    }
+  });
+}
+
+/**
  * Builds all synthetic blocks in a container element.
  * @param {Element} main The container element
  */
@@ -97,6 +125,7 @@ function buildAutoBlocks(main) {
         });
       });
     }
+    buildEmbedAutoBlocks(main);
     buildWidgetAutoBlocks(main);
   } catch (error) {
     // eslint-disable-next-line no-console
@@ -115,7 +144,8 @@ function decorateButtons(main) {
     const text = a.textContent.trim();
 
     // quick structural checks
-    if (a.querySelector('img') || p.textContent.trim() !== text) return;
+    const hasContentImage = [...a.querySelectorAll('img')].some((img) => !img.closest('.icon'));
+    if (hasContentImage || p.textContent.trim() !== text) return;
 
     // skip URL display links
     try {

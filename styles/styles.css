@@ -295,6 +295,28 @@ main img {
   width: 100%;
 }
 
+.icon.icon-spark {
+  position: relative;
+  color: currentcolor;
+}
+
+.icon.icon-spark img {
+  display: none;
+}
+
+.icon.icon-spark::before,
+.icon.icon-spark::after {
+  content: "";
+  position: absolute;
+  inset: 4px 9px;
+  border-radius: 999px;
+  background: currentcolor;
+}
+
+.icon.icon-spark::after {
+  transform: rotate(90deg);
+}
+
 /* sections */
 main > .section {
   margin: 40px 0;
