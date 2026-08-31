@@ -3,8 +3,13 @@
   margin: 0;
   padding: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(257px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(257px, 320px));
+  justify-content: center;
   gap: 24px;
+}
+
+.banner-wrapper + .cards-wrapper {
+  margin-top: 48px;
 }
 
 .cards > ul > li {
