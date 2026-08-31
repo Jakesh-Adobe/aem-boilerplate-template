@@ -7,13 +7,14 @@
     content="script-src 'nonce-aem' 'strict-dynamic' 'unsafe-inline' http: https:; base-uri 'self'; object-src 'none';"
     move-to-http-header="true"
   >
-  <title>Page not found</title>
+  <title>Page Not Found - 404 Error</title>
   <script nonce="aem" type="text/javascript">
     window.isErrorPage = true;
     window.errorCode = '404';
   </script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta property="og:title" content="Page not found">
+  <meta property="og:title" content="Page not found - 404 Error">
+  <meta name="description" content="The page you are looking for does not exist or has been moved.">
   <script nonce="aem" src="/scripts/scripts.js" type="module"></script>
   <script nonce="aem" type="module">
     window.addEventListener('load', () => {
@@ -21,10 +22,10 @@
         const { origin, pathname } = new URL(document.referrer);
         if (origin === window.location.origin) {
           const backBtn = document.createElement('a');
-          backBtn.classList.add('button', 'error-button-back');
+          backBtn.classList.add('button', 'secondary', 'error-button-back');
           backBtn.href = pathname;
-          backBtn.textContent = 'Go back';
-          backBtn.title = 'Go back';
+          backBtn.textContent = '← Go Back';
+          backBtn.title = 'Go back to previous page';
           const btnContainer = document.querySelector('.button-container');
           btnContainer.append(backBtn);
         }
@@ -41,14 +42,118 @@
       min-height: calc(100vh - var(--nav-height));
       display: flex;
       align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    main.error .section {
+      text-align: center;
+      color: white;
+      padding: 60px 40px;
+      max-width: 600px;
     }
 
     main.error .error-number {
-      width: 100%;
+      width: 200px;
+      height: 200px;
+      margin: 0 auto 40px;
+      display: block;
+      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
     }
 
     main.error .error-number text {
-      font-family: monospace;
+      font-family: 'Arial Black', monospace;
+      font-size: 120px;
+      font-weight: bold;
+      fill: white;
+    }
+
+    main.error h2.error-message {
+      font-size: 36px;
+      margin: 20px 0;
+      color: white;
+    }
+
+    main.error p {
+      font-size: 18px;
+      margin: 20px 0 40px 0;
+      color: rgba(255, 255, 255, 0.9);
+      line-height: 1.6;
+    }
+
+    main.error .button-container {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin: 40px 0 0 0;
+    }
+
+    main.error .button {
+      padding: 14px 32px;
+      font-size: 16px;
+      font-weight: bold;
+      border-radius: 4px;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      display: inline-block;
+    }
+
+    main.error .button.secondary {
+      background-color: rgba(255, 255, 255, 0.2);
+      border: 2px solid white;
+      color: white;
+    }
+
+    main.error .button.secondary:hover {
+      background-color: white;
+      color: #667eea;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    main.error .button.error-button-home {
+      background-color: white;
+      color: #667eea;
+      border: 2px solid white;
+    }
+
+    main.error .button.error-button-home:hover {
+      background-color: rgba(255, 255, 255, 0.9);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    @media (width < 900px) {
+      main.error {
+        padding: 20px;
+      }
+
+      main.error .section {
+        padding: 40px 20px;
+      }
+
+      main.error .error-number {
+        width: 150px;
+        height: 150px;
+      }
+
+      main.error .error-number text {
+        font-size: 90px;
+      }
+
+      main.error h2.error-message {
+        font-size: 28px;
+      }
+
+      main.error p {
+        font-size: 16px;
+      }
+
+      main.error .button {
+        width: 100%;
+        max-width: 280px;
+      }
     }
   </style>
   <link rel="stylesheet" href="/styles/lazy-styles.css">
@@ -58,12 +163,13 @@
   <header></header>
   <main class="error">
     <div class="section">
-      <svg viewBox="1 0 38 18" class="error-number">
-        <text x="0" y="17">404</text>
+      <svg viewBox="0 0 200 200" class="error-number">
+        <text x="10" y="140">404</text>
       </svg>
-      <h2 class="error-message">Page Not Found</h2>
+      <h2 class="error-message">Oops! Page Not Found</h2>
+      <p>Sorry, the page you are looking for does not exist or has been moved to a different location. Please check the URL and try again.</p>
       <p class="button-container">
-        <a href="/" class="button secondary error-button-home">Go home</a>
+        <a href="/" class="button secondary error-button-home">← Back to Home</a>
       </p>
     </div>
   </main>
