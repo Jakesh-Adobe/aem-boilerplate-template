@@ -7,7 +7,7 @@ export default function decorate(block) {
   // Find elements
   let imageCol = null;
   let titleCol = null;
-  let contentRows = [];
+  const contentRows = [];
   let ctaCol = null;
 
   const rows = [...block.children];
@@ -20,8 +20,8 @@ export default function decorate(block) {
     if (picture) {
       // This is the image
       imageCol = col;
-    } else if (index === 0) {
-      // First row without image is the title
+    } else if (!titleCol && col.querySelector('h1, h2, h3')) {
+      // First heading row is the title, regardless of image position
       titleCol = col;
     } else if (col.querySelector('a')) {
       // Row with link is the CTA
