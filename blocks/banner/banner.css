@@ -1,0 +1,152 @@
+/* Banner Block Container */
+.banner-container .banner-wrapper {
+  max-width: unset;
+  padding: 0;
+}
+
+.banner {
+  background-color: #0066cc;
+  padding: 0;
+  margin: 0;
+  min-height: auto;
+}
+
+/* Main Banner Row - Flex Layout */
+.banner .banner-main-row {
+  display: flex;
+  width: 100%;
+  align-items: stretch;
+  gap: 0;
+  background-color: #0066cc;
+}
+
+/* Image Column */
+.banner .banner-image-col {
+  flex: 0 0 45%;
+  padding: 0;
+  overflow: hidden;
+}
+
+.banner .banner-image-col picture {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.banner .banner-image-col img {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;
+}
+
+/* Content Column */
+.banner .banner-content-col {
+  flex: 1;
+  background-color: #0066cc;
+  color: white;
+  padding: 60px 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* Title Styling */
+.banner .banner-title-col {
+  margin-bottom: 20px;
+}
+
+.banner .banner-title {
+  color: white !important;
+  margin: 0 0 20px 0;
+  padding: 0;
+  font-size: var(--heading-font-size-l);
+  font-weight: bold;
+}
+
+.banner h1,
+.banner h2,
+.banner h3 {
+  color: white !important;
+  margin: 0 0 20px 0;
+  padding: 0;
+}
+
+/* Content Text */
+.banner .banner-content-text {
+  margin-bottom: 30px;
+}
+
+.banner p {
+  color: white;
+  margin: 0;
+  padding: 0;
+  font-size: var(--body-font-size-m);
+  line-height: 1.6;
+}
+
+/* CTA Button Styling */
+.banner .banner-cta-col {
+  margin-top: 20px;
+}
+
+.banner .banner-cta-button {
+  display: inline-block;
+  padding: 14px 32px;
+  background-color: white;
+  color: #0066cc;
+  text-decoration: none;
+  border: 2px solid white;
+  border-radius: 4px;
+  font-weight: bold;
+  font-size: 16px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  text-shadow: none;
+}
+
+.banner .banner-cta-button:hover {
+  background-color: #f0f0f0;
+  border-color: #f0f0f0;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Ensure all text is white */
+.banner * {
+  color: white !important;
+}
+
+.banner .banner-cta-button {
+  color: #0066cc !important;
+}
+
+/* Mobile Responsive Design */
+@media (width < 900px) {
+  .banner .banner-main-row {
+    flex-direction: column;
+  }
+
+  .banner .banner-image-col {
+    flex: 1;
+    width: 100%;
+    min-height: 300px;
+  }
+
+  .banner .banner-content-col {
+    padding: 40px 20px;
+    flex: auto;
+  }
+
+  .banner .banner-title {
+    font-size: var(--heading-font-size-m);
+  }
+}
+
+/* Desktop/Tablet Layout */
+@media (width >= 900px) {
+  .banner .banner-image-col {
+    min-height: 400px;
+  }
+}
