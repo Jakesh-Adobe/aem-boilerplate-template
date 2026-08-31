@@ -25,18 +25,22 @@
   flex: 0 0 45%;
   padding: 0;
   overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .banner .banner-image-col picture {
-  display: block;
+  display: flex;
   width: 100%;
   height: 100%;
   object-fit: cover;
+  align-items: center;
 }
 
 .banner .banner-image-col img {
   width: 100%;
-  height: auto;
+  height: 100%;
   display: block;
   object-fit: cover;
 }
