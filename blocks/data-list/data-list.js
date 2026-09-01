@@ -79,41 +79,53 @@ export default async function decorate(block) {
       const endIdx = Math.min(startIdx + itemsPerPage, items.length);
       const pageItems = items.slice(startIdx, endIdx);
 
+      console.log('Rendering page', pageNum, 'with', pageItems.length, 'items');
+
       // Clear and render items
       listContainer.innerHTML = '';
       const ul = document.createElement('ul');
       ul.className = 'data-list-ul';
 
-      pageItems.forEach((item) => {
-        const li = document.createElement('li');
-        li.className = 'data-list-item';
+      if (pageItems.length === 0) {
+        console.warn('No items to display on this page');
+        const emptyLi = document.createElement('li');
+        emptyLi.textContent = 'No items available';
+        ul.append(emptyLi);
+      } else {
+        pageItems.forEach((item, idx) => {
+          console.log('Rendering item', idx, ':', item);
+          const li = document.createElement('li');
+          li.className = 'data-list-item';
 
-        // Create content for each column
-        const columns_map = columns.map((col) => ({
-          name: col,
-          value: item[col],
-        }));
+          // Create content for each column
+          const columns_map = columns.map((col) => ({
+            name: col,
+            value: item[col],
+          }));
 
-        // If only one column, show as simple text
-        if (columns.length === 1) {
-          li.textContent = item[columns[0]];
-        } else {
-          // Multiple columns: create a row structure
-          const itemContent = document.createElement('div');
-          itemContent.className = 'data-list-item-content';
-          
-          columns_map.forEach((col, idx) => {
-            const span = document.createElement('span');
-            span.className = `data-list-col data-list-col-${idx}`;
-            span.textContent = col.value || '';
-            itemContent.append(span);
-          });
+          // If only one column, show as simple text
+          if (columns.length === 1) {
+            const text = item[columns[0]] || '(empty)';
+            li.textContent = text;
+          } else {
+            // Multiple columns: create a row structure
+            const itemContent = document.createElement('div');
+            itemContent.className = 'data-list-item-content';
+            
+            columns_map.forEach((col, idx) => {
+              const span = document.createElement('span');
+              span.className = `data-list-col data-list-col-${idx}`;
+              const value = col.value !== undefined && col.value !== null ? String(col.value).trim() : '(empty)';
+              span.textContent = value;
+              itemContent.append(span);
+            });
 
-          li.append(itemContent);
-        }
+            li.append(itemContent);
+          }
 
-        ul.append(li);
-      });
+          ul.append(li);
+        });
+      }
 
       listContainer.append(ul);
 
