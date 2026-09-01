@@ -46,7 +46,19 @@ export default async function decorate(block) {
       columns = data.columns || [];
     }
 
-    console.log('Items:', items.length, 'Columns:', columns);
+    console.log('=== DATA LIST DEBUG ===');
+    console.log('Total items:', items.length);
+    console.log('Columns detected:', columns);
+    console.log('First item raw data:', items[0]);
+    console.log('First item keys:', items[0] ? Object.keys(items[0]) : 'No items');
+    
+    // Fallback: if no columns detected, extract from first item
+    if (columns.length === 0 && items.length > 0) {
+      columns = Object.keys(items[0]);
+      console.log('Columns extracted from first item:', columns);
+    }
+
+    console.log('Final columns:', columns);
 
     if (items.length === 0) {
       block.innerHTML = '<p>No data available</p>';
@@ -93,29 +105,39 @@ export default async function decorate(block) {
         ul.append(emptyLi);
       } else {
         pageItems.forEach((item, idx) => {
-          console.log('Rendering item', idx, ':', item);
+          console.log('--- Item', idx, '---');
+          console.log('Item object:', item);
+          console.log('Item keys:', Object.keys(item));
+          
           const li = document.createElement('li');
           li.className = 'data-list-item';
 
           // Create content for each column
-          const columns_map = columns.map((col) => ({
-            name: col,
-            value: item[col],
-          }));
+          const columns_map = columns.map((col) => {
+            const val = item[col];
+            console.log(`Column "${col}" value:`, val, 'Type:', typeof val);
+            return {
+              name: col,
+              value: val,
+            };
+          });
 
           // If only one column, show as simple text
           if (columns.length === 1) {
-            const text = item[columns[0]] || '(empty)';
+            const colName = columns[0];
+            const text = item[colName] || '(empty)';
+            console.log('Single column mode, value:', text);
             li.textContent = text;
           } else {
             // Multiple columns: create a row structure
             const itemContent = document.createElement('div');
             itemContent.className = 'data-list-item-content';
             
-            columns_map.forEach((col, idx) => {
+            columns_map.forEach((col, colIdx) => {
               const span = document.createElement('span');
-              span.className = `data-list-col data-list-col-${idx}`;
+              span.className = `data-list-col data-list-col-${colIdx}`;
               const value = col.value !== undefined && col.value !== null ? String(col.value).trim() : '(empty)';
+              console.log(`  Span ${colIdx} (${col.name}): "${value}"`);
               span.textContent = value;
               itemContent.append(span);
             });
