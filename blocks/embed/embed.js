@@ -46,21 +46,8 @@ const embedVimeo = (url, autoplay) => {
 };
 
 const embedTwitter = (url) => {
+  console.log('embedTwitter called with:', url.href);
   const tweetHtml = `<blockquote class="twitter-tweet"><a href="${url.href}"></a></blockquote>`;
-  
-  // Schedule Twitter widget processing after the DOM is updated
-  if (window.twttr && window.twttr.widgets) {
-    setTimeout(() => {
-      window.twttr.widgets.load();
-    }, 100);
-  } else {
-    loadScript('https://platform.twitter.com/widgets.js', () => {
-      if (window.twttr && window.twttr.widgets) {
-        window.twttr.widgets.load();
-      }
-    });
-  }
-  
   return tweetHtml;
 };
 
@@ -100,14 +87,26 @@ const loadEmbed = (block, link, autoplay) => {
       block.innerHTML = embedHtml;
       block.className = `block embed embed-${config.match[0]}`;
       
-      // For Twitter embeds, reprocess the widget
-      if (config.match.includes('twitter') || config.match.includes('x.com')) {
-        setTimeout(() => {
-          if (window.twttr && window.twttr.widgets) {
-            console.log('Processing Twitter widget');
+      // For Twitter embeds, load widget script and reprocess
+      if (link.includes('twitter.com') || link.includes('x.com')) {
+        console.log('Twitter embed detected, loading widget script');
+        
+        // If script already loaded, just process the widget
+        if (window.twttr && window.twttr.widgets && window.twttr.widgets.load) {
+          console.log('Twitter widget already loaded, processing');
+          setTimeout(() => {
             window.twttr.widgets.load();
-          }
-        }, 200);
+          }, 100);
+        } else {
+          // Load the Twitter widget script
+          console.log('Loading Twitter widget script');
+          loadScript('https://platform.twitter.com/widgets.js', () => {
+            console.log('Twitter widget script loaded, processing');
+            if (window.twttr && window.twttr.widgets && window.twttr.widgets.load) {
+              window.twttr.widgets.load();
+            }
+          });
+        }
       }
     } else {
       console.log('No specific config, using default embed');
