@@ -79,6 +79,9 @@ function buildWidgetAutoBlocks(main) {
  * @param {Element} main The container element
  */
 function buildEmbedAutoBlocks(main) {
+  console.log('buildEmbedAutoBlocks running');
+  
+  // Find all media links (YouTube, Vimeo, Twitter/X)
   const embedLinks = [...main.querySelectorAll('a[href]')].filter((link) => {
     const href = link.href;
     return href.includes('youtube.com')
@@ -88,8 +91,13 @@ function buildEmbedAutoBlocks(main) {
       || href.includes('x.com');
   });
 
+  console.log('Found', embedLinks.length, 'embed links');
+
   embedLinks.forEach((link) => {
-    if (link.closest('.embed')) return;
+    if (link.closest('.embed')) {
+      console.log('Link already in embed block, skipping');
+      return;
+    }
 
     const p = link.closest('p');
     if (
@@ -97,7 +105,44 @@ function buildEmbedAutoBlocks(main) {
       && p.querySelectorAll('a').length === 1
       && p.textContent.trim() === link.textContent.trim()
     ) {
+      console.log('Converting standalone link to embed block:', link.href);
       p.replaceWith(buildBlock('embed', { elems: [link.cloneNode(true)] }));
+    }
+  });
+  
+  // Also handle tables with "embed" label in first cell
+  const tables = [...main.querySelectorAll('table')];
+  tables.forEach((table) => {
+    const firstCell = table.querySelector('td, th');
+    if (firstCell && firstCell.textContent.trim().toLowerCase() === 'embed') {
+      // This is an embed block table, convert it
+      const cells = table.querySelectorAll('td, th');
+      if (cells.length > 1) {
+        // Look for URL in cells
+        let embedUrl = null;
+        for (const cell of cells) {
+          const link = cell.querySelector('a[href]');
+          if (link) {
+            embedUrl = link;
+            break;
+          }
+          const text = cell.textContent.trim();
+          if (text.startsWith('http')) {
+            embedUrl = text;
+            break;
+          }
+        }
+        
+        if (embedUrl) {
+          console.log('Converting embed table to embed block:', embedUrl);
+          const block = buildBlock('embed', { elems: [embedUrl instanceof Element ? embedUrl.cloneNode(true) : document.createElement('a')] });
+          if (!(embedUrl instanceof Element)) {
+            block.querySelector('a').href = embedUrl;
+            block.querySelector('a').textContent = embedUrl;
+          }
+          table.parentElement.replaceWith(block);
+        }
+      }
     }
   });
 }

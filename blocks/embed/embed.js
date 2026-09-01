@@ -51,7 +51,12 @@ const embedTwitter = (url) => {
 };
 
 const loadEmbed = (block, link, autoplay) => {
-  if (block.classList.contains('embed-is-loaded')) return;
+  console.log('loadEmbed called with:', { link, autoplay });
+  
+  if (block.classList.contains('embed-is-loaded')) {
+    console.log('Embed already loaded, skipping');
+    return;
+  }
 
   const embedsConfig = [
     {
@@ -69,42 +74,73 @@ const loadEmbed = (block, link, autoplay) => {
   ];
 
   const config = embedsConfig.find((e) => e.match.some((match) => link.includes(match)));
+  console.log('Embed config found:', config?.match);
+  
   try {
     const url = new URL(link);
+    console.log('URL parsed successfully:', url.hostname);
+    
     if (config) {
-      block.innerHTML = config.embed(url, autoplay);
+      const embedHtml = config.embed(url, autoplay);
+      console.log('Generated embed HTML:', embedHtml.substring(0, 100));
+      block.innerHTML = embedHtml;
       block.className = `block embed embed-${config.match[0]}`;
     } else {
+      console.log('No specific config, using default embed');
       block.innerHTML = getDefaultEmbed(url);
       block.className = 'block embed';
     }
   } catch (error) {
     console.error('Embed loading error:', error, link);
-    block.innerHTML = `<p>Unable to load embed: <a href="${link}">${link}</a></p>`;
+    block.innerHTML = `<p style="color: red; padding: 20px;">Error loading embed for: <a href="${link}">${link}</a></p>`;
   }
   block.classList.add('embed-is-loaded');
+  console.log('Embed loading complete, final HTML:', block.innerHTML.substring(0, 150));
 };
 
 export default function decorate(block) {
   const placeholder = block.querySelector('picture');
   
-  // Find link - could be direct child or nested in table structure
-  let link = block.querySelector('a')?.href;
+  // Debug: log what we're working with
+  console.log('Embed block decorator running', {
+    blockClass: block.className,
+    blockHTML: block.innerHTML.substring(0, 200),
+  });
   
-  // If no link found directly, search all text content for URLs
+  // Method 1: Find direct link in anchor tags
+  let link = block.querySelector('a')?.href;
+  console.log('Method 1 - Direct anchor search:', link);
+  
+  // Method 2: Find all text and extract URL
   if (!link) {
-    const text = block.textContent.trim();
-    const urlMatch = text.match(/(https?:\/\/[^\s]+)/);
-    if (urlMatch) {
-      link = urlMatch[1];
+    const allText = block.textContent;
+    console.log('Method 2 - Searching in text:', allText.substring(0, 150));
+    
+    // Look for URLs in any format
+    const urlPatterns = [
+      /https?:\/\/(www\.)?(youtube|youtu\.be|vimeo|twitter|x\.com)[^\s]*/gi,
+      /https?:\/\/[^\s]*/i
+    ];
+    
+    for (const pattern of urlPatterns) {
+      const match = allText.match(pattern);
+      if (match) {
+        link = match[0];
+        console.log('Found URL with pattern:', link);
+        break;
+      }
     }
   }
   
+  console.log('Final link found:', link);
+  
   if (!link) {
-    console.warn('Embed block: no valid link found');
+    console.error('Embed block: no valid link found in', block.innerHTML);
+    block.innerHTML = '<p style="color: red; padding: 20px; background: #ffe0e0; border: 1px solid #ff0000;">Error: No embed URL found. Please add a YouTube, Vimeo, or Twitter URL.</p>';
     return;
   }
   
+  // Clear the block content
   block.textContent = '';
 
   if (placeholder) {
@@ -117,20 +153,9 @@ export default function decorate(block) {
     });
     block.append(wrapper);
   } else {
-    // Check if element is already in viewport, load immediately if so
-    const rect = block.getBoundingClientRect();
-    if (rect.top < window.innerHeight && rect.bottom > 0) {
-      // Element is visible, load immediately
+    // Use a small timeout to ensure DOM is ready, then load
+    setTimeout(() => {
       loadEmbed(block, link);
-    } else {
-      // Element not in viewport, use IntersectionObserver
-      const observer = new IntersectionObserver((entries) => {
-        if (entries.some((e) => e.isIntersecting)) {
-          observer.disconnect();
-          loadEmbed(block, link);
-        }
-      });
-      observer.observe(block);
-    }
+    }, 100);
   }
 }
