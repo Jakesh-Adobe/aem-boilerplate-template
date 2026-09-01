@@ -46,8 +46,22 @@ const embedVimeo = (url, autoplay) => {
 };
 
 const embedTwitter = (url) => {
-  loadScript('https://platform.twitter.com/widgets.js');
-  return `<blockquote class="twitter-tweet"><a href="${url.href}"></a></blockquote>`;
+  const tweetHtml = `<blockquote class="twitter-tweet"><a href="${url.href}"></a></blockquote>`;
+  
+  // Schedule Twitter widget processing after the DOM is updated
+  if (window.twttr && window.twttr.widgets) {
+    setTimeout(() => {
+      window.twttr.widgets.load();
+    }, 100);
+  } else {
+    loadScript('https://platform.twitter.com/widgets.js', () => {
+      if (window.twttr && window.twttr.widgets) {
+        window.twttr.widgets.load();
+      }
+    });
+  }
+  
+  return tweetHtml;
 };
 
 const loadEmbed = (block, link, autoplay) => {
@@ -85,6 +99,16 @@ const loadEmbed = (block, link, autoplay) => {
       console.log('Generated embed HTML:', embedHtml.substring(0, 100));
       block.innerHTML = embedHtml;
       block.className = `block embed embed-${config.match[0]}`;
+      
+      // For Twitter embeds, reprocess the widget
+      if (config.match.includes('twitter') || config.match.includes('x.com')) {
+        setTimeout(() => {
+          if (window.twttr && window.twttr.widgets) {
+            console.log('Processing Twitter widget');
+            window.twttr.widgets.load();
+          }
+        }, 200);
+      }
     } else {
       console.log('No specific config, using default embed');
       block.innerHTML = getDefaultEmbed(url);
