@@ -43,6 +43,8 @@
   color: #333;
   font-size: 14px;
   line-height: 1.5;
+  display: block;
+  min-height: 20px;
 }
 
 .data-list-col:first-child {
