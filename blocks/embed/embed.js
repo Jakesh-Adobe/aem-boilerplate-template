@@ -69,23 +69,43 @@ const loadEmbed = (block, link, autoplay) => {
   ];
 
   const config = embedsConfig.find((e) => e.match.some((match) => link.includes(match)));
-  const url = new URL(link);
-  if (config) {
-    block.innerHTML = config.embed(url, autoplay);
-    block.classList = `block embed embed-${config.match[0]}`;
-  } else {
-    block.innerHTML = getDefaultEmbed(url);
-    block.classList = 'block embed';
+  try {
+    const url = new URL(link);
+    if (config) {
+      block.innerHTML = config.embed(url, autoplay);
+      block.className = `block embed embed-${config.match[0]}`;
+    } else {
+      block.innerHTML = getDefaultEmbed(url);
+      block.className = 'block embed';
+    }
+  } catch (error) {
+    console.error('Embed loading error:', error, link);
+    block.innerHTML = `<p>Unable to load embed: <a href="${link}">${link}</a></p>`;
   }
   block.classList.add('embed-is-loaded');
 };
 
 export default function decorate(block) {
   const placeholder = block.querySelector('picture');
-  const link = block.querySelector('a')?.href;
+  
+  // Find link - could be direct child or nested in table structure
+  let link = block.querySelector('a')?.href;
+  
+  // If no link found directly, search all text content for URLs
+  if (!link) {
+    const text = block.textContent.trim();
+    const urlMatch = text.match(/(https?:\/\/[^\s]+)/);
+    if (urlMatch) {
+      link = urlMatch[1];
+    }
+  }
+  
+  if (!link) {
+    console.warn('Embed block: no valid link found');
+    return;
+  }
+  
   block.textContent = '';
-
-  if (!link) return;
 
   if (placeholder) {
     const wrapper = document.createElement('div');
@@ -97,12 +117,20 @@ export default function decorate(block) {
     });
     block.append(wrapper);
   } else {
-    const observer = new IntersectionObserver((entries) => {
-      if (entries.some((e) => e.isIntersecting)) {
-        observer.disconnect();
-        loadEmbed(block, link);
-      }
-    });
-    observer.observe(block);
+    // Check if element is already in viewport, load immediately if so
+    const rect = block.getBoundingClientRect();
+    if (rect.top < window.innerHeight && rect.bottom > 0) {
+      // Element is visible, load immediately
+      loadEmbed(block, link);
+    } else {
+      // Element not in viewport, use IntersectionObserver
+      const observer = new IntersectionObserver((entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          observer.disconnect();
+          loadEmbed(block, link);
+        }
+      });
+      observer.observe(block);
+    }
   }
 }
