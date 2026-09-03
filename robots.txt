@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://main--aem-boilerplate-template--jakesh-adobe.aem.live/sitemap-index.xml
