@@ -9,10 +9,6 @@ indices:
       - '/fragments/**'
     target: /query-index.json
     properties:
-      path:
-        select: none
-        value: |
-          path(rootPath)
       title:
         select: head > meta[property="og:title"]
         value: |
